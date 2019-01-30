@@ -17,8 +17,6 @@ phases:
         - sed -i 's@CONTAINER_TAG@'"$TAG"'@' green_deploy.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
-        # Make all pods blue
-        - kubectl get pods -l app=hello-k8s -o json | jq -r '.items[].metadata.name' | xargs -i kubectl label pods {} type=blue
   build:
     commands:
       - docker build --tag $REPOSITORY_URI:$TAG .
@@ -29,6 +27,10 @@ phases:
       - export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
       - export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
+      # Make all pods blue
+      - kubectl get pods -l app=hello-k8s -o json | jq -r '.items[].metadata.name' | xargs -i kubectl label pods {} type=blue
+
+      # Deploy green
       - kubectl apply -f green.yml
       # Wait until the Deployment is ready by checking the MinimumReplicasAvailable condition.
       - |
