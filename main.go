@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +15,7 @@ import (
 )
 
 const (
-	version = "v0.11"
+	version = "v0.12"
 )
 
 func main() {
@@ -25,6 +26,17 @@ func main() {
 	})
 
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	})
+
+	http.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
+		const (
+			a = 3
+			b = 4
+		)
+		c := math.Sqrt(a*a + b*b)
+		log.Println("%.1f", c)
+
 		w.WriteHeader(200)
 	})
 
