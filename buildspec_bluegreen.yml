@@ -41,7 +41,7 @@ phases:
 
       # Update the service selector with the new version
       - kubectl apply -f green_deploy.yml
-      - kubectl delete pods -l app=hello-k8s type=blue
+      - kubectl delete pods -l app=hello-k8s -l type=blue
       - printf '[{"name":"hello-k8s","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
   files: build.json
