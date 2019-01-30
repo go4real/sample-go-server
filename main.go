@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,6 +16,13 @@ import (
 const (
 	version = "v0.12"
 )
+
+func Fib(n int) int {
+	if n < 2 {
+		return n
+	}
+	return Fib(n-1) + Fib(n-2)
+}
 
 func main() {
 	log.Println("Starting helloworld application...")
@@ -30,14 +36,8 @@ func main() {
 	})
 
 	http.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
-		const (
-			a = 3
-			b = 4
-		)
-		c := math.Sqrt(a*a + b*b)
-		log.Println("%.1f", c)
-
-		w.WriteHeader(200)
+		Fib(45)
+		fmt.Fprintf(w, ".")
 	})
 
 	http.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
