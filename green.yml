@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-k8s-CONTAINER_TAG
+  labels:
+    app: hello-k8s
+    tag: CONTAINER_TAG
 spec:
   replicas: 20
   # strategy:
