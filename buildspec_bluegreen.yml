@@ -1,0 +1,47 @@
+---
+version: 0.2
+phases:
+  install:
+    commands:
+      # Install prerequisite
+      - curl -sS -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
+      - curl -sS -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl ./aws-iam-authenticator
+      - export PATH=$PWD/:$PATH
+      - apt-get update && apt-get -y install jq python3-pip python3-dev && pip3 install --upgrade awscli
+  pre_build:
+      commands:
+        - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+        - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' green.yml
+        - sed -i 's@CONTAINER_TAG@'"$TAG"'@' green.yml
+        - sed -i 's@CONTAINER_TAG@'"$TAG"'@' green_deploy.yml
+        - $(aws ecr get-login --no-include-email)
+        - export KUBECONFIG=$HOME/.kube/config
+        # Make all pods blue
+        - kubectl get pods -l app=hello-k8s -o json | jq -r '.items[].metadata.name' | xargs -i kubectl label pods {} type=blue
+  build:
+    commands:
+      - docker build --tag $REPOSITORY_URI:$TAG .
+
+  post_build:
+    commands:
+      - docker push $REPOSITORY_URI:$TAG
+      - export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+      - export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
+      - kubectl apply -f green.yml
+      # Wait until the Deployment is ready by checking the MinimumReplicasAvailable condition.
+      - |
+        READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"') 
+        while [[ "$READY" != "True" ]]; do
+          READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"')
+          sleep 3
+        done
+      # Update the service selector with the new version
+      - kubectl apply -f green_deploy.yml
+      - kubectl delete pods -l app=hello-k8s type=blue
+      - printf '[{"name":"hello-k8s","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
+artifacts:
+  files: build.json
+
+
