@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-k8s
+  name: hello-k8s-CONTAINER_TAG
 spec:
   replicas: 20
   # strategy:

@@ -32,11 +32,13 @@ phases:
       - kubectl apply -f green.yml
       # Wait until the Deployment is ready by checking the MinimumReplicasAvailable condition.
       - |
-        READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"') 
-        while [[ "$READY" != "True" ]]; do
-          READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"')
-          sleep 3
-        done
+        # READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"') 
+        # while [[ "$READY" != "True" ]]; do
+        #   READY=$(kubectl get deploy hello-k8s -o json -l app=hello-k8s -l tag=$TAG | jq '.status.conditions[] | select(.reason == "MinimumReplicasAvailable") | .status' | tr -d '"')
+        #   sleep 3
+        # done
+        sleep 3
+
       # Update the service selector with the new version
       - kubectl apply -f green_deploy.yml
       - kubectl delete pods -l app=hello-k8s type=blue
