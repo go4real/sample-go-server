@@ -29,7 +29,11 @@ func main() {
 	})
 
 	http.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, version)
+		hostName, err := os.Hostname()
+		if err != nil {
+			hostName = "undefined"
+		}
+		fmt.Fprintf(w, "[%s] %s", hostName, version)
 	})
 
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
