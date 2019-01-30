@@ -33,7 +33,7 @@ func main() {
 		if err != nil {
 			hostName = "undefined"
 		}
-		fmt.Fprintf(w, "[%s] %s", hostName, version)
+		fmt.Fprintf(w, "[%s] %s\n", hostName, version)
 	})
 
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
