@@ -7,11 +7,6 @@ metadata:
     tag: CONTAINER_TAG
 spec:
   replicas: 20
-  # strategy:
-  #   type: RollingUpdate
-  #   rollingUpdate:
-  #     maxUnavailable: 2
-  #     maxSurge: 2
   selector:
     matchLabels:
       app: hello-k8s

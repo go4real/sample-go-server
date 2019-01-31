@@ -27,7 +27,7 @@ phases:
       - export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
       - export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
-      # Make a previous deploy blue
+      # Make a previous deploy blue 
       - kubectl get deploy -l app=hello-k8s -o json | jq -r '.items[].metadata.name' | xargs -i kubectl label deploy {} type=blue
 
       # Deploy green
