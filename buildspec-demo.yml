@@ -3,19 +3,12 @@ version: 0.1
 phases:
 
   install: 
-    commands:
-      - go get -u github.com/golang/lint/golint
-
-  pre_build: 
-    commands:
-
-      # Ensure code passes all lint tests
-      - golint -set_exit_status
+    runtime-versions:
+      golang: 1.12
 
   build:
     commands:
-
-      # Build our application
+      - echo Building the Go code...
       - go build -o app
 
 artifacts:
