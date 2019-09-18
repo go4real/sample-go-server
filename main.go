@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	version = "v0.21"
+	version = "v0.22"
 )
 
 // Fib for CPU load generation
