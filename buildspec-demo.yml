@@ -1,0 +1,27 @@
+version: 0.1
+            
+phases:
+
+  install: 
+    commands:
+      - go get -u github.com/golang/lint/golint
+
+  pre_build: 
+    commands:
+
+      # Ensure code passes all lint tests
+      - golint -set_exit_status
+
+  build:
+    commands:
+
+      # Build our application
+      - go build -o app
+
+artifacts:
+  files:
+    - app
+    - appspec.yml
+    - buildspec-demo.yml
+    - config/*
+    - codedeploy/*
